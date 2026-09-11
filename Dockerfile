@@ -1,17 +1,15 @@
-FROM python:3.11-slim AS builder
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
-
 FROM python:3.11-slim
 
 WORKDIR /app
-COPY --from=builder /root/.local /root/.local
+
+# 直接安装到系统（不用 --user）
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制代码
 COPY app.py .
 
-ENV PATH=/root/.local/bin:$PATH
-
+# 创建非 root 用户
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
